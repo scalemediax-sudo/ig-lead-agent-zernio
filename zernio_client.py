@@ -5,7 +5,7 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
-ZERNIO_BASE_URL = "https://zernio.com/api/v1"
+ZERNIO_BASE_URL = "https://api.zernio.com/v1"
 
 
 def _headers() -> dict:
@@ -15,14 +15,15 @@ def _headers() -> dict:
     }
 
 
-async def send_message(conversation_id: str, text: str) -> dict:
-    """Send a DM reply via Zernio's unified inbox API."""
+async def send_message(conversation_id: str, text: str, account_id: str) -> dict:
+    """Send a DM reply via Zernio inbox API."""
+    url = f"{ZERNIO_BASE_URL}/inbox/conversations/{conversation_id}/messages"
     async with httpx.AsyncClient(timeout=30) as client:
         try:
             response = await client.post(
-                f"{ZERNIO_BASE_URL}/messages",
+                url,
                 headers=_headers(),
-                json={"conversation_id": conversation_id, "text": text},
+                json={"accountId": account_id, "text": text},
             )
             response.raise_for_status()
             return response.json()
@@ -30,7 +31,7 @@ async def send_message(conversation_id: str, text: str) -> dict:
             logger.error(
                 "Zernio send_message HTTP %s: %s",
                 e.response.status_code,
-                e.response.text,
+                e.response.text[:300],
             )
             raise
         except Exception as e:

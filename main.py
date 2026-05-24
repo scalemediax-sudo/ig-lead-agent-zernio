@@ -75,7 +75,7 @@ async def webhook(request: Request):
 
     conversation_id = (
         conversation_obj.get("id")
-        or payload.get("conversation_id")  # fallback flat key
+        or payload.get("conversation_id")
     )
     message_text = message_obj.get("text", "").strip()
     sender_id    = sender_obj.get("id", "")
@@ -85,6 +85,13 @@ async def webhook(request: Request):
         or "there"
     )
     platform = account_obj.get("platform", "instagram")
+    # Zernio account ID — try several payload locations then fall back to env/known value
+    account_id = (
+        account_obj.get("id")
+        or account_obj.get("_id")
+        or conversation_obj.get("accountId")
+        or os.getenv("ZERNIO_ACCOUNT_ID", "")
+    )
 
     if not conversation_id or not message_text:
         logger.warning(
@@ -128,7 +135,7 @@ async def webhook(request: Request):
     )
 
     # ── Send reply ────────────────────────────────────────────────────────────
-    await zernio_client.send_message(conversation_id, reply_text)
+    await zernio_client.send_message(conversation_id, reply_text, account_id)
 
     if stage == "qualified":
         logger.info(
