@@ -1,0 +1,21 @@
+# Environment
+.env
+
+# Database (persisted on Railway via volume if needed)
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
