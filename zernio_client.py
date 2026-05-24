@@ -23,7 +23,7 @@ async def send_message(conversation_id: str, text: str, account_id: str) -> dict
             response = await client.post(
                 url,
                 headers=_headers(),
-                json={"accountId": account_id, "text": text},
+                json={"accountId": account_id, "message": text},
             )
             response.raise_for_status()
             return response.json()
